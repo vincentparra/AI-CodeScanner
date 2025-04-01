@@ -41,7 +41,7 @@
 
     <!--    generate javaDOC    -->
     <target name="generate-javadoc">
-        <javadoc packagenames="com.rocs.medical.records.application.*"
+        <javadoc packagenames="com.rocs.code.scanner.*"
                  sourcepath="${src.dir}"
                  destdir="${doc.dir}"
                  version="${version}"
@@ -50,7 +50,7 @@
             <group title="Data layer" packages="com.rocs.code.scanner.data.*"/>
             <group title="App layer" packages="com.rocs.code.scanner.app.*"/>
 
-            <doctitle><![CDATA[Infirmary Application Documentation - ${version}]]></doctitle>
+            <doctitle><![CDATA[AI CodeScanner Documentation - ${version}]]></doctitle>
             <bottom>
                 <![CDATA[Copyright © ${copyright.year}. All Rights Reserved.]]>
             </bottom>
