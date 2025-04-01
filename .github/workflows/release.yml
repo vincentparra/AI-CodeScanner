@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
-          tags: true
+          fetch-tags: true
 
       - name: Set up JDK
         uses: actions/setup-java@v4
