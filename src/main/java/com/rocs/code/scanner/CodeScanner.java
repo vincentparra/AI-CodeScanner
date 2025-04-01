@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CodeScanner {
     public static void main(String[] args) {
-        AnalyzeCode codescanner = new AnalyzeCodeImpl();
+//        AnalyzeCode codescanner = new AnalyzeCodeImpl();
         FindFilePath filePath = new FindFilePathImpl();
         List<Path> paths = filePath.findPath();
         for(Path path:paths){
