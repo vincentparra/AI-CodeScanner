@@ -3,7 +3,7 @@ name: Auto Tag
 on:
   push:
     branches:
-      - main  # Change if using a different main branch
+      - master  # Change if using a different main branch
 
 jobs:
   tag:
