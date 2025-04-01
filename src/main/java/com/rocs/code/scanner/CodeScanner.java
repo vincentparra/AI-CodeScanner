@@ -51,6 +51,7 @@ public class CodeScanner {
             }
             System.out.println("Minor update2");
             System.out.println("another update");
+            System.out.println("fix ");
         }
     }
 }
