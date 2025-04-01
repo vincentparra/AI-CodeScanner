@@ -1,4 +1,4 @@
-<project name="infirmary-application" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="ai-code-scanner" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <property file="build.properties"/>
     <property name="build.dir" location="build"/>
@@ -45,11 +45,10 @@
                  sourcepath="${src.dir}"
                  destdir="${doc.dir}"
                  version="${version}"
-                 windowtitle="Infirmary Application Documentation">
+                 windowtitle="AI-CodeScanner">
 
-            <group title="Data layer" packages="com.rocs.medical.records.application.data.*"/>
-            <group title="Model layer" packages="com.rocs.medical.records.application.model.*"/>
-            <group title="Facade layer" packages="com.rocs.medical.records.application.app.facade.*"/>
+            <group title="Data layer" packages="com.rocs.code.scanner.data.*"/>
+            <group title="App layer" packages="com.rocs.code.scanner.app.*"/>
 
             <doctitle><![CDATA[Infirmary Application Documentation - ${version}]]></doctitle>
             <bottom>
