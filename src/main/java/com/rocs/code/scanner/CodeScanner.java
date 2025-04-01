@@ -50,6 +50,7 @@ public class CodeScanner {
                 System.out.println("-----------------------------------------------------------------------------------");
             }
             System.out.println("Minor update2");
+            System.out.println("another update");
         }
     }
 }
