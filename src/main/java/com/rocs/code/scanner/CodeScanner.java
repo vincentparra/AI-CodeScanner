@@ -49,7 +49,7 @@ public class CodeScanner {
                 System.out.println("Chance of AI generated code is Low");
                 System.out.println("-----------------------------------------------------------------------------------");
             }
-            System.out.println("Minor update");
+            System.out.println("Minor update2");
         }
     }
 }
