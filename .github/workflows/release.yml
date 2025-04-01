@@ -29,24 +29,25 @@ jobs:
       - name: Determine next version
         id: semantic
         run: |
-          npx semantic-release
-          echo "NEW_VERSION=$(npx semantic-release | grep 'The next release version is' | sed 's/.*is //')" >> $GITHUB_ENV
+          VERSION=$(npx semantic-release --dry-run | grep 'The next release version is' | sed 's/.*is //')
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Next version: $VERSION"
 
       - name: Update version in build.properties
-        if: env.NEW_VERSION != ''
+        if: env.NEW_VERSION
         run: |
-          ant update-version -Dnew.version=${{ env.NEW_VERSION }}
+          ant update-version -Dnew.version=$NEW_VERSION
 
       - name: Update version in build.xml
-        if: env.NEW_VERSION != ''
+        if: env.NEW_VERSION
         run: |
-          sed -i "s/<property name=\"version\" value=\".*\"\/>/<property name=\"version\" value=\"$NEW_VERSION\"\/>/g" build.xml
+          sed -i "s/\(<property name=\"version\" value=\)\"[^\"]*\"/\1\"$NEW_VERSION\"/" build.xml
 
       - name: Build release artifacts
         run: ant -noinput -buildfile build.xml release
 
       - name: Release
-        if: env.NEW_VERSION != ''
+        if: env.NEW_VERSION
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx semantic-release
