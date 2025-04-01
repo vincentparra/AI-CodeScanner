@@ -40,4 +40,4 @@ jobs:
       - name: Create and Push Tag
         run: |
           git tag ${{ env.NEW_TAG }}
-          git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git ${{ env.NEW_TAG }}
+          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git ${{ env.NEW_TAG }}
