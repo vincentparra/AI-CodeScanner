@@ -11,14 +11,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FindFilePathImpl implements FindFilePath {
-    private Path root = Paths.get("src");
+    private Path root = Paths.get("src/main");
     @Override
     public List<Path> findPath() {
         try {
-            List<Path> pathStream = Files.walk(root).toList();
-            return pathStream.stream().filter(path -> path.toString().endsWith(".java")).toList();
+            List<Path> pathStream = Files.walk(root).collect(Collectors.toList());;
+            return pathStream.stream().filter(path -> path.toString().endsWith(".java")).collect(Collectors.toList())
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
