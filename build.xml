@@ -90,7 +90,7 @@
 
     <!--    run JAR    -->
     <target name="run" description="Run the application">
-        <java jar="${dist.dir}/CodeScanner.jar" fork="true"/>
+        <java jar="${dist.dir}/CodeScanner-${version}.jar" fork="true"/>
     </target>
 
 </project>
