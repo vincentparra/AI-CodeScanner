@@ -3,7 +3,7 @@ name: Auto Tag
 on:
   push:
     branches:
-      - master  # Change if using a different main branch
+      - master  # Change this if you're using a different main branch (e.g., "main")
 
 jobs:
   tag:
@@ -37,7 +37,14 @@ jobs:
 
           echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
 
+      - name: Set Git Config
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
       - name: Create and Push Tag
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}  # Ensure the token is passed from the secrets
         run: |
           git tag ${{ env.NEW_TAG }}
           git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git ${{ env.NEW_TAG }}
