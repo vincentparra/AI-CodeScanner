@@ -83,7 +83,7 @@
     </target>
 
     <!--release process -->
-    <target name="release" depends="build, build-jar, generate-javadoc"
+    <target name="release" depends="build, build-jar, generate-javadoc, update-version"
             description="Performs a complete release build">
         <echo>Creating release version ${version}</echo>
     </target>
