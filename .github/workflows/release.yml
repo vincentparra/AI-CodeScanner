@@ -1,54 +1,43 @@
-name: Semantic Release
+name: Auto Tag
 
 on:
-  workflow_run:
-    workflows: ["Java CI"]
-    branches: [ master ]
-    types: [ completed ]
+  push:
+    branches:
+      - main  # Change if using a different main branch
 
 jobs:
-  release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  tag:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
-          fetch-tags: true
+          fetch-depth: 0  # Required to get all tags
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
+      - name: Get Latest Tag
+        id: get_latest_tag
+        run: echo "TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)" >> $GITHUB_ENV
 
-      - name: Setup semantic-release
+      - name: Calculate Next Tag
+        id: next_tag
         run: |
-          npm install -g semantic-release @semantic-release/git @semantic-release/changelog
+          latest_tag=${{ env.TAG }}
+          echo "Latest tag: $latest_tag"
 
-      - name: Determine next version
-        id: semantic
+          # Extract version numbers
+          major=$(echo $latest_tag | cut -d'.' -f1 | sed 's/v//')
+          minor=$(echo $latest_tag | cut -d'.' -f2)
+          patch=$(echo $latest_tag | cut -d'.' -f3)
+
+          # Increment patch version
+          new_patch=$((patch + 1))
+          new_tag="v$major.$minor.$new_patch"
+          echo "New tag: $new_tag"
+
+          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
+
+      - name: Create and Push Tag
         run: |
-          VERSION=$(npx semantic-release --dry-run | grep 'The next release version is' | sed 's/.*is //')
-          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Next version: $VERSION"
-
-      - name: Update version in build.properties
-        if: env.NEW_VERSION
-        run: |
-          ant update-version -Dnew.version=$NEW_VERSION
-
-      - name: Update version in build.xml
-        if: env.NEW_VERSION
-        run: |
-          sed -i "s/\(<property name=\"version\" value=\)\"[^\"]*\"/\1\"$NEW_VERSION\"/" build.xml
-
-      - name: Build release artifacts
-        run: ant -noinput -buildfile build.xml release
-
-      - name: Release
-        if: env.NEW_VERSION
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx semantic-release
+          git tag ${{ env.NEW_TAG }}
+          git push origin ${{ env.NEW_TAG }}
