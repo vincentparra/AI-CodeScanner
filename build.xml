@@ -1,4 +1,4 @@
-<project name="ai-code-scanner" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="ai-code-scanner" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <property file="build.properties"/>
     <property name="build.dir" location="build"/>
@@ -83,14 +83,14 @@
     </target>
 
     <!--release process -->
-    <target name="release" depends="build, build-jar, generate-javadoc"
+    <target name="release" depends="build, build-jar, generate-javadoc, update-version"
             description="Performs a complete release build">
         <echo>Creating release version ${version}</echo>
     </target>
 
     <!--    run JAR    -->
     <target name="run" description="Run the application">
-        <java jar="${dist.dir}/CodeScanner.jar" fork="true"/>
+        <java jar="${dist.dir}/CodeScanner-${version}.jar" fork="true"/>
     </target>
 
 </project>
