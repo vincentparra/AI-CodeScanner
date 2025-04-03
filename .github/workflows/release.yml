@@ -1,50 +1,44 @@
-name: Auto Tag
+name: Semantic Release
 
 on:
-  push:
-    branches:
-      - master  # Change this if you're using a different main branch (e.g., "main")
+  workflow_run:
+    workflows: ["Java CI"]
+    branches: [ master ]
+    types: [ completed ]
 
 jobs:
-  tag:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required to get all tags
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Latest Tag
-        id: get_latest_tag
-        run: echo "TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
 
-      - name: Calculate Next Tag
-        id: next_tag
+      - name: Setup semantic-release
         run: |
-          latest_tag=${{ env.TAG }}
-          echo "Latest tag: $latest_tag"
+          npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec @semantic-release/replace
 
-          # Extract version numbers
-          major=$(echo $latest_tag | cut -d'.' -f1 | sed 's/v//')
-          minor=$(echo $latest_tag | cut -d'.' -f2)
-          patch=$(echo $latest_tag | cut -d'.' -f3)
-
-          # Increment patch version
-          new_patch=$((patch + 1))
-          new_tag="v$major.$minor.$new_patch"
-          echo "New tag: $new_tag"
-
-          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
-
-      - name: Set Git Config
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-      - name: Create and Push Tag
+      - name: Determine next version and update files
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}  # Ensure the token is passed from the secrets
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git tag ${{ env.NEW_TAG }}
-          git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git ${{ env.NEW_TAG }}
+          npx semantic-release --branches master
+
+      - name: Release
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
