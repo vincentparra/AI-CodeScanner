@@ -28,14 +28,12 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup semantic-release
-        run: |
-          npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec @semantic-release/replace
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec @semantic-release/replace
 
       - name: Determine next version and update files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run:
-            - npx semantic-release --branches master
+          run: npx semantic-release --branches master
 
       - name: Update version in build.properties
         if: env.NEW_VERSION != ''
