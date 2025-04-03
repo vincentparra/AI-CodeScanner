@@ -19,13 +19,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
-          fetch-tags: true
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '11'
           distribution: 'temurin'
 
       - name: Setup semantic-release
@@ -39,14 +38,14 @@ jobs:
             - npx semantic-release --branches master
 
       - name: Update version in build.properties
-        if: env.NEW_VERSION
+        if: env.NEW_VERSION != ''
         run: |
-          ant update-version -Dnew.version=$NEW_VERSION
+          ant update-version -Dnew.version=${{ env.NEW_VERSION }}
 
       - name: Update version in build.xml
-        if: env.NEW_VERSION
+        if: env.NEW_VERSION != ''
         run: |
-          sed -i "s/\(<property name=\"version\" value=\)\"[^\"]*\"/\1\"$NEW_VERSION\"/" build.xml
+          sed -i "s/<property name=\"version\" value=\".*\"\/>/<property name=\"version\" value=\"$NEW_VERSION\"\/>/g" build.xml
 
       - name: Build release artifacts
         run: ant -noinput -buildfile build.xml release
@@ -54,5 +53,5 @@ jobs:
       - name: Release
         if: success()
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: npx semantic-release
