@@ -10,6 +10,11 @@ jobs:
   release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,14 +30,13 @@ jobs:
 
       - name: Setup semantic-release
         run: |
-          npm install -g semantic-release @semantic-release/git @semantic-release/changelog
+          npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/exec @semantic-release/replace
 
-      - name: Determine next version
-        id: semantic
-        run: |
-          VERSION=$(npx semantic-release --dry-run | grep 'The next release version is' | sed 's/.*is //')
-          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Next version: $VERSION"
+      - name: Determine next version and update files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run:
+            - npx semantic-release --branches master
 
       - name: Update version in build.properties
         if: env.NEW_VERSION
@@ -48,7 +52,7 @@ jobs:
         run: ant -noinput -buildfile build.xml release
 
       - name: Release
-        if: env.NEW_VERSION
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx semantic-release
